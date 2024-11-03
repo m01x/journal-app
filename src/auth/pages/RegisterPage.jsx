@@ -1,32 +1,44 @@
+import { useState } from 'react';
 import { Link as RouterDomLink } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { Button, Grid, Link, TextField, Typography } from "@mui/material"
 import { AuthLayout } from '../layout/AuthLayout';
 import { useForm } from '../../hooks';
+import { startCreatingUserWithEmailPassword } from '../../store/auth';
 
 
 const formData = {
-  email: 'flavionieves@gmail.com',
-  password: '123456',
-  displayName: 'Flavio Ortiz',
+  email: '',
+  password: '',
+  displayName: '',
 }
 
 //*Vamos a crear nuestras propias validaciones y enviarlas como un objeto a nuestro custom hook
 const formValidations = {
-  email: [ ( value ) => { return value.includes('@') }, 'El correo debe contener un @.'],
-  password: [(value) => {return value.lenght >= 6  }, 'El password debe contener al menos 6 letras.'],
-  displayName: [ (value) => { return value.lenght >= 1 }, 'El nombre no puede estar vacío.' ]
-}
+  email: [ ( value ) => value.includes('@') , 'El correo debe contener un @.'],
+  password: [(value) => value.length >= 6  , 'El password debe contener al menos 6 letras.'],
+  displayName: [ (value) => value.length >= 1 , 'El nombre no puede estar vacío.' ]
+};
 
 
 export const RegisterPage = () => {
+
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const dispatch = useDispatch();
 
   const { formState, displayName, email, password, onInputChange,
           isFormValid, displayNameValid, emailValid, passwordValid
   } = useForm( formData , formValidations );
 
+  
+
   const onSubmit = (event) => {
     event.preventDefault();
-    console.log( formState );
+    setFormSubmitted(true);
+    
+    console.log(isFormValid)
+    if ( !isFormValid ) return;
+    dispatch(startCreatingUserWithEmailPassword(formState))
     
   }
 
@@ -44,7 +56,7 @@ export const RegisterPage = () => {
               name='displayName'
               value={ displayName }
               onChange={ onInputChange }
-              error={ !displayNameValid }
+              error={ !!displayNameValid && formSubmitted}
               helperText={ displayNameValid }
               />
             </Grid>
@@ -56,6 +68,8 @@ export const RegisterPage = () => {
               fullWidth
               name='email'
               value={ email }
+              error={ !!emailValid && formSubmitted}
+              helperText={ emailValid }
               onChange={ onInputChange }
               />
             </Grid>
@@ -68,6 +82,8 @@ export const RegisterPage = () => {
               fullWidth
               name='password'
               value={ password }
+              error={ !!passwordValid && formSubmitted}
+              helperText={passwordValid}
               onChange={ onInputChange }
               />
             </Grid>
