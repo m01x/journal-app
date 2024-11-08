@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword } from "firebase/auth";
 import { FireBaseAuth } from "./config";
 
 const googleProvider = new GoogleAuthProvider();
@@ -58,9 +58,28 @@ export const registerWithEmailPassword = async({ email, password, displayName}) 
   }
 }
 
-export const loginWithEmailPassword = () => {
+export const loginWithEmailPassword = async( { email , password} ) => {
   
     //! Funcion de firebase es signInWithEmailAndPassword , similar al register.
-    
+    try {
+        const resp = await signInWithEmailAndPassword(FireBaseAuth, email, password);
+        const {uid, photoURL, displayName} = resp.user;
+        return {
+            ok:true,
+            uid, photoURL, displayName
+        }
+        
+        
+    } catch (error) {
+        const errorCode     = error.code;
+        const errorMessage  = error.message;
+
+        return{
+            ok:false,
+            errorCode,
+            errorMessage,
+        }
+    }
+
 }
 
