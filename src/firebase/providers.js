@@ -58,3 +58,9 @@ export const registerWithEmailPassword = async({ email, password, displayName}) 
   }
 }
 
+export const loginWithEmailPassword = () => {
+  
+    //! Funcion de firebase es signInWithEmailAndPassword , similar al register.
+    
+}
+
