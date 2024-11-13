@@ -1,8 +1,12 @@
+import { useSelector } from "react-redux";
 import { TurnedInNot } from "@mui/icons-material"
 import { Box, Divider, Drawer, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material"
 
 
 export const SideBar = ({ drawerWidth }) => {
+    const {displayName, errorMessage} = useSelector( state => state.auth);
+    console.log(displayName);
+    
   return (
     <Box
         component='nav'
@@ -15,7 +19,9 @@ export const SideBar = ({ drawerWidth }) => {
         >
             <Toolbar>
                 <Typography variant="h6" noWrap component="div">
-                    Flavio Ortiz
+                    {(displayName)
+                    ? displayName
+                    : 'user-name'}
                 </Typography>
             </Toolbar>
             <Divider/>

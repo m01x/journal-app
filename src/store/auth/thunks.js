@@ -1,5 +1,5 @@
 
-import { loginWithEmailPassword, registerWithEmailPassword, signInWithGoogle } from "../../firebase/providers";
+import { loginWithEmailPassword, logoutFirebase, registerWithEmailPassword, signInWithGoogle } from "../../firebase/providers";
 import { checkingCredentials, login, logout } from "./authSlice";
 
 export const checkingAuthentication = (email, password) => {
@@ -50,4 +50,18 @@ export const startLoginWithEmailPassword = ({email, password} ) => {
   }
 
 
+}
+
+export const startLogout = () => {
+ 
+  return async( dispatch ) => {
+    //Puedo poner un try catch aqui, por si acaso.
+    try {
+      await logoutFirebase();
+      dispatch( logout() );
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
 }
