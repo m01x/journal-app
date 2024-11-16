@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../store/auth";
 import { FireBaseAuth } from "../firebase/config";
+import { startLoadingNotes } from "../store/journal";
 
 
 export const useCheckAuth = () => {
@@ -11,10 +12,12 @@ export const useCheckAuth = () => {
   
     useEffect(() => {
       onAuthStateChanged( FireBaseAuth, async( user ) => {
-        if ( !user ) return dispatch( logout() );
-  
-        const { uid, email, displayName, photoURL } = user;
-        dispatch( login({ uid, email, displayName, photoURL }) );
+          if ( !user ) return dispatch( logout() );
+    
+          const { uid, email, displayName, photoURL } = user;
+          dispatch( login({ uid, email, displayName, photoURL }) );
+          dispatch( startLoadingNotes() );
+
       });
     },[]);
 
