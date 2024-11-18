@@ -1,6 +1,6 @@
-import { collection, doc, setDoc } from 'firebase/firestore/lite';
 import { FireBaseDB } from '../../firebase/config';
-import { addNewEmptyNote, savingNewNote, setActiveNote, setNotes } from './';
+import { collection, doc, setDoc } from 'firebase/firestore/lite';
+import { addNewEmptyNote, savingNewNote, setActiveNote, setNotes, setSaving, updateNote } from './';
 import { loadNotes } from '../../helpers';
 
 export const startNewNote = () => {
@@ -41,6 +41,26 @@ export const startLoadingNotes = () => {
     dispatch( setNotes( notesFromFirebase ) );
     
 
+
+  }
+}
+
+export const startSaveNote = () => {
+  return async( dispatch, getState ) => {
+
+    dispatch( setSaving() );
+
+    const { uid } = getState().auth;
+    const { active:note } = getState().journal;
+
+    //* Hay que remover el ID de la nota.
+
+    const noteToFirestore = {...note};
+    delete noteToFirestore.id; //Esto es de ES6+ , elimina una propiedad de un objeto... buena!!
+    const docRef = doc( FireBaseDB, `${ uid }/journal/notes/${ note.id }` );
+    await setDoc( docRef, noteToFirestore, { merge:true } ); //Podriamos usar un try catch aqui!
+
+    dispatch( updateNote( note ) ); 
 
   }
 }
