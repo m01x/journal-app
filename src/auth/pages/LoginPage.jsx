@@ -7,13 +7,19 @@ import { AuthLayout } from '../layout/AuthLayout';
 import { useForm } from '../../hooks';
 import { startGoogleSignIn, startLoginWithEmailPassword } from '../../store/auth';
 
+
+const initialData = {
+  email:'',
+  password:''
+}
+
 export const LoginPage = () => {
 
   const {status, errorMessage} = useSelector( state => state.auth);
 
   const dispatch = useDispatch();
 
-  const { email, password, onInputChange } = useForm();
+  const { email, password, onInputChange } = useForm(initialData);
 
 
   const isAuthenticating = useMemo(
