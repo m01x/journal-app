@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from "react";
-import { SaveOutlined } from "@mui/icons-material";
-import { Button, Grid, TextField, Typography } from "@mui/material";
+import { useEffect, useMemo, useRef } from "react";
+import { SaveOutlined, UploadOutlined } from "@mui/icons-material";
+import { Button, Grid, IconButton, TextField, Typography } from "@mui/material";
 import Swal from "sweetalert2";
 import { ImageGallery } from "../components";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +21,8 @@ export const NoteView = () => {
 
     }, [date]);
 
+    const fileInputRef = useRef();
+
     useEffect(() => {
 
       dispatch( setActiveNote(formState) );
@@ -40,12 +42,34 @@ export const NoteView = () => {
       dispatch( startSaveNote() );
     }
 
-  return (
+const onFileInputChange = ({ target }) => {
+  if( target.files === 0 ) return;
+  console.log('⏳ Subiendo Archivos...')
+  //dispatch( startUploadingFiles( target.files ) );
+
+}
+return (
     <Grid container direction='row' justifyContent='space-between' alignItems='center' sx={{ mb:1 }} className="animate__animated animate__fadeIn animate__faster">
         <Grid item>
             <Typography fontSize={39} fontWeight="light" >{ dateString }</Typography>
         </Grid>
         <Grid item>
+            <input 
+                type="file"
+                multiple
+                ref={ fileInputRef }
+                onChange={ onFileInputChange }
+                style={{ display:'none' }}
+            />
+
+            <IconButton
+              color="primary"
+              disabled={isSaving}
+              onClick={() => fileInputRef.current.click()} //Esto manda a llamar al ref y ejecuta en su referencia (destino) la accion invocada
+              //En este caso, ocultamos el <input/> tradicional, para ser llamado por este iconbutton, por eso usamos useRef
+            >
+                <UploadOutlined/>
+            </IconButton>
             <Button
                 disabled={ isSaving }
                 onClick={ onSaveNote } 
