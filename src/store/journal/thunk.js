@@ -1,6 +1,6 @@
 import { FireBaseDB } from '../../firebase/config';
-import { collection, doc, setDoc } from 'firebase/firestore/lite';
-import { addNewEmptyNote, savingNewNote, setActiveNote, setNotes, setSaving, updateNote } from './';
+import { collection, deleteDoc, doc, setDoc } from 'firebase/firestore/lite';
+import { addNewEmptyNote, deleteNoteById, savingNewNote, setActiveNote, setNotes, setPhotosToActiveState, setSaving, updateNote } from './';
 import { loadNotes } from '../../helpers';
 import { fileUpload } from '../../helpers/fileUpload';
 
@@ -70,6 +70,34 @@ export const startUploadingFiles = ( files = []) => {
   return async( dispatch )=>{
 
     dispatch( setSaving() );
-    await fileUpload( files[0]);
+
+    //No realizar la subida asi: await fileUpload( files[0]);
+
+    /**
+     * Promise.all sirve para disparar muchas funciones q devuelven promesas, una vez 
+     * todas esten resueltas...
+     */
+    const fileUploadPromises = [];
+    for ( const file of files){
+      fileUploadPromises.push( fileUpload(file) ); //No hay un .then(), no se han disparado las promises.
+    }
+    const photosUrl = await Promise.all( fileUploadPromises ); //Cuando esto se resuelva, tendre un arreglo con todas las resoluciones.
+    
+    dispatch( setPhotosToActiveState( photosUrl ) );
+  }
+}
+
+
+export const startDeletingNote = () => {
+  return async( dispatch, getState ) => {
+
+    const { uid } = getState().auth;
+    const { active:note } =getState().journal;
+
+    //Ahora construiremos la referencia al documento para que firebase elimine la nota.
+    const docRef = doc( FireBaseDB, `${ uid }/journal/notes/${ note.id }`);
+    await deleteDoc( docRef);
+
+    dispatch( deleteNoteById( note.id ));
   }
 }
